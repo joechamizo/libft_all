@@ -153,8 +153,6 @@ All generated suggestions were manually reviewed, adapted, tested, and validated
 - `valgrind` (zero memory leaks verified);
 - extreme testing setups using variable buffer sizes from 1 to 10M.
 
-The final responsibility for the code, the tests, and the project defense remains with the author.
-
 ---
 
 ## ⚖️ Academic Disclaimer
