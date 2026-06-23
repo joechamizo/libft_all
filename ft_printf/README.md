@@ -120,9 +120,10 @@ The entire implementation was manually audited, adapted, compiled, and approved 
 
 ---
 
-## ⚖️ Disclaimer
+## ⚖️ Academic Disclaimer
 
-This repository has been created purely for academic purposes and as part of my learning process in the **42** curriculum.
+This repository has been created for purely academic purposes as part of my personal learning journey through the **42 network** curriculum.
 
-* **Use at your own risk:** I am not responsible for the use made of the code in this repository, nor for the consequences derived from its copying, modification, or reuse in your own submissions.
-* **42 Copy Policy (Plagiarism):** 42 students are reminded that plagiarism or direct copying of code without understanding how it works violates school rules and can be penalized in accordance with...
+* **Use at your own risk:** I do not take any responsibility for how the code in this repository is used, nor for any consequences arising from its duplication, modification, or reuse in your own project submissions.
+* **42 Plagiarism Policy:** 42 students are heavily reminded that plagiarism or direct code copying without fully understanding its inner workings violates the school rules and can be severely penalized by both automated testing systems (*Moulinette*) and human peer-evaluators.
+* **Purpose:** This codebase is shared with the sole purpose of serving as an engineering reference, technical guide, or inspiration for building advanced custom Makefiles and automated interactive test suites.
