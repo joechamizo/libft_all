@@ -1,73 +1,128 @@
-# 📝 Printf
+# ft_printf
 
-## Descripción 
+## 👤 General Project Description and AI Collaboration
 
-Este proyecto consiste en replicar el funcionamiento de la función original de printf. 
-Se deben implementar las siguientes conversiones:
+To keep the project understandable, maintainable, and aligned with the 42 evaluation process, development was structured around efficient variable argument handling, a unified state control system, and an optimized data flushing flow.
 
-| Conversión  | Descripción														 			|
-|-------|-----------------------------------------------------------------------------------|
-| **%c** | Imprime un solo carácter.       													|
-| **%s** | Imprime una string (como se define por defecto en C).											|
-| **%p** | El puntero void * dado como argumento se imprime en formato hexadecimal.								|
-| **%d** | Imprime un número decimal (base 10).																	|
-| **%i** | Imprime un entero en base 10.               											|
-| **%u** | Imprime un número decimal (base 10) sin signo.               									|
-| **%x** | Imprime un número hexadecimal (base 16) en minúsculas.                				|
-| **%X** | Imprime un número hexadecimal (base 16) en mayúsculas.                				|
-| **%%** | Imprime el símbolo del porcentaje.                 											|
+- **Unified State Architecture:** Designed and implemented a control mechanism based on a single structure (`t_printf`) to encapsulate the buffer and flag states, removing the need for global variables.
+- **Output Optimization:** Implemented a buffering system to mitigate the impact of system calls, accumulating characters in RAM before performing write operations.
+- **Advanced Modularity:** Structured the control flow into specific atomic modules to strictly comply with the maximum restriction of 5 functions per file required by the 42 Norm.
 
-◦ La función printf retorna el número de caracteres impresos, o un valor negativo si ocurre un error.
+---
 
-◦ No se debe implementar la gestión del buffer del original.
+## 📝 Description
 
-Prototipo de la función:
+The **ft_printf** project consists of recreating the famous `printf` function from the standard C library (`libc`). The main goal is to learn how to handle variadic functions and to dive deeper into efficient data flow management through the use of an output buffer.
 
-```C
-int ft_printf(char const *s, ...);
+This implementation accurately mimics the original behavior of `printf`, returning the total number of characters printed and managing various types of conversions and format flags under the strict restrictions of the 42 Norm.
+
+---
+
+## 📂 Project Structure
+
+To comply with the maximum restriction of 5 functions per file, the code is meticulously organized as follows:
+
+- **🚀 ft_printf.c:** Main entry point, buffer lifecycle management, and main format parsing loop.
+- **🔍 ft_parser.c:** Syntactic analysis and capture of flags (`-`, `0`, `.`, `#`, ` `, `+`), field width, and precision calculation.
+- **🛤️ ft_dispatch.c:** Conversion dispatcher in charge of routing control to the appropriate module according to the specifier.
+- **🔢 ft_print_nums.c:** Processing and printing logic for integers (`%d`, `%i`, `%u`) with rigorous sign management.
+- **⬢ ft_print_hex.c:** Conversion logic for hexadecimal formats (`%x`, `%X`) and memory addresses/pointers (`%p`).
+- **🛠️ ft_utils.c:** Base project tools, numerical length calculation, and arithmetic base management.
+
+---
+
+## 📐 Technical Decisions: Algorithm and Data Structure
+
+The project is designed under a modular paradigm where the control structure directs the data flow through memory buffers before interacting with the operating system.
+
+### 💾 Unified Data Structure: `t_printf`
+
+A unified data structure has been designed to act as the "global state" of the function. It contains the character buffer, the current index, the total count of printed bytes, and all boolean and numerical variables for the flags.
+
+- **Justification:** It allows full and safe access to information through a single pointer passed by reference. This completely eliminates the use of forbidden global variables and facilitates modular communication between the different project files.
+
+### ⚡ Output Algorithm: Active Buffer Management
+
+Instead of printing each character individually using repeated primitive calls, the system uses a static 4096-byte buffer in memory.
+
+- **Justification:** System calls (`write`) are computationally expensive operations due to the context switch between user space and kernel space. Minimizing these calls drastically optimizes the overall performance of the function, accumulating data in RAM and flushing the block only when the buffer is full or the function finishes.
+
+### 🎯 Formatting Algorithm: Hierarchical Pre-calculation
+
+To correctly resolve the complex combination of bonus flags, a three-step predictive algorithm is used:
+
+1. **Capture:** The parser extracts the numerical values of the field width and precision, and activates the present flags.
+2. **Calculation:** The total size that the final text "box" will occupy is mathematically determined (calculating padding spaces, precision zeros, prefixes like `0x`, or `+`/`-` signs alongside the numerical value).
+3. **Flushing:** The components are sent to the buffer in a strict and sequential hierarchical order, ensuring that the final format is identical to that of `libc`.
+
+---
+
+## 🧠 Defense Guide and Edge Cases
+
+To pass the most demanding automated tests in the 42 community, the code implements native solutions for critical scenarios:
+
+- **Null Pointer Management (`%s` and `%p` with NULL):** If a `NULL` pointer is passed to a string specifier, it safely prints `(null)` (or variants depending on the operating system). For `%p` pointers, it manages the correct output as `(nil)` or `0x0`.
+- **Integer Overflows:** Handling numbers like `LONG_MIN` or `INT_MIN` is done by using higher-capacity data types (`long long` or `unsigned long long`) during intermediate calculations to avoid undefined behavior.
+- **Conflicting Flags Prone to Cancellation:** The code features implicit precedence logic. For example, the `-` flag (left alignment) overrides the effect of the `0` flag (zero padding), and the `+` flag (always show sign) takes priority over the ` ` (blank space) flag.
+
+---
+
+## 🛠️ Usage and Compilation
+
+### Requirements
+- `cc`, `clang`, or `gcc`
+- `make` automation tool
+- Unix-based environment (Linux, macOS)
+
+### Library Compilation
+
+To generate the static library file (`libftprintf.a`), execute the base command in the project root:
+```bash
+make
+```
+The Makefile includes the mandatory rules required by the subject: `all`, `clean`, `fclean`, and `re`.
+
+### Linking and Integration
+
+To use `ft_printf` in your own C source code, include its header and link the generated `.a` file during the compilation of your final binary:
+
+```c
+#include "ft_printf.h"
+
+int main(void)
+{
+    ft_printf("Hello %s, the number is %+10.5d\n", "World", 42);
+    return (0);
+}
 ```
 
-## Ejemplo de uso
+```bash
+gcc main.c libftprintf.a -o my_program
+./my_program
+```
 
-<b>Código: </b>
+---
 
-![B030DA8C-43A1-48E6-A658-AE30472548C0](https://user-images.githubusercontent.com/66915274/198844199-3761987c-df3d-4c3d-90d1-e9f30583b83a.jpeg)
+## 📚 Resources and References
 
-<b>Output: </b>
+### Bibliographical References
+- Linux Manual: `printf(3)` function reference.
+- ISO/IEC 9899 Standard: Official documentation on variadic types and associated macros (`va_list`, `va_start`, `va_arg`, `va_end`).
+- System call optimization guidelines in POSIX systems.
 
-<img width="538" alt="Screen Shot 2022-10-29 at 6 54 40 PM" src="https://user-images.githubusercontent.com/66915274/198843655-23c772e4-1465-458b-9642-019bc62456dc.png">
+### AI Usage Declaration
+Generative artificial intelligence assistance was strictly used as a support and architectural optimization tool during the workflow:
+- **Architectural Design:** Conceptualization of the unified `t_printf` control structure for modularity between files.
+- **Memory Optimization:** Refactoring of the output buffer logic to ensure the minimum amount of calls to `write()`.
+- **Documentation:** Generation and structural formatting of the visual schemes in this README.md file.
 
-## Funciones autorizadas 
+The entire implementation was manually audited, adapted, compiled, and approved using the official tool suites, ensuring full compliance with the 42 Norminette and the absolute absence of memory leaks.
 
-| Función  | Descripción														 			|
-|-------|-----------------------------------------------------------------------------------|
-| malloc | Solicitar un bloque de memoria del tamaño suministrado como parámetro.     													|
-| free | Desasigna un bloque de memoria que se había asignado previamente mediante una llamada. 											|
-| write | Hace que los bytes que indiques del buffer sean escritos en el file descriptor seleccionado.								|
-| va_start | Permite el acceso a los argumentos de la función variada.														|
-| va_arg | Accede al siguiente argumento de la función variada.               											|
-| va_copy | Hace una copia de los argumentos de la función variádica.               									|
-| va_end | Finaliza el recorrido de los argumentos de la función variada.                				|
+---
 
-# Author ✍🏼
+## ⚖️ Disclaimer
 
-<table>
-  <tr>
-    <td align="center"><a href="https://github.com/gemartin99/"><img src="https://avatars.githubusercontent.com/u/66915274?v=4" width="100px;" alt="100px"/><br /><sub><b>gemartin</b></sub></a><br /><a href="https://profile.intra.42.fr/users/gemartin" title="Intra 42"><img src="https://img.shields.io/badge/Barcelona-FFFFFF?style=plastic&logo=42&logoColor=000000" alt="Intra 42"/></a></td>
-  </tr>
-</table>
+This repository has been created purely for academic purposes and as part of my learning process in the **42** curriculum.
 
-# Quizás pueda interesarte!
-
-### - Para ver mi progresion en el common core 42 ↙️
-
-[AQUÍ](https://github.com/gemartin99/42cursus)
-
-### - Mi perfil en la intranet de 42 ↙️
-[AQUÍ](https://profile.intra.42.fr/users/gemartin)
-
-# Contacto 📥
-
-◦ Email: gemartin@student.42barcelona.com
-
-◦ Linkedin: https://www.linkedin.com/in/gemartin99/
+* **Use at your own risk:** I am not responsible for the use made of the code in this repository, nor for the consequences derived from its copying, modification, or reuse in your own submissions.
+* **42 Copy Policy (Plagiarism):** 42 students are reminded that plagiarism or direct copying of code without understanding how it works violates school rules and can be penalized in accordance with...
